@@ -84,7 +84,8 @@ async def test_the_dashboard_app_serves_the_real_dashboard_without_any_backgroun
     p, client = web
     assert client.get("/").text.startswith("BharatDesk dashboard")
     assert client.get("/health").json()["status"] == "ok"
-    assert client.get("/docs").status_code == 404  # no API docs page exposed
+    for hidden in ("/docs", "/redoc", "/openapi.json"):
+        assert client.get(hidden).status_code == 404  # no API docs or route listing exposed
     assert not hasattr(client.app.state, "background_tasks")  # nothing runs in the background
     await _org(p)
     await _visit(p)

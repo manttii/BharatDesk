@@ -48,7 +48,13 @@ def create_dashboard_app(settings: Settings | None = None) -> FastAPI:
         )
     _check(cfg)
 
-    app = FastAPI(title="BharatDesk dashboard", version=VERSION, docs_url=None, redoc_url=None)
+    app = FastAPI(
+        title="BharatDesk dashboard",
+        version=VERSION,
+        docs_url=None,
+        redoc_url=None,
+        openapi_url=None,  # no public listing of routes
+    )
     engine = make_engine(cfg.database_url, serverless=True)
     app.state.settings = cfg
     app.state.engine = engine
