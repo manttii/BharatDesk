@@ -141,23 +141,26 @@ def test_the_vercel_entry_point_exposes_an_asgi_app(
     monkeypatch.setenv("DATABASE_URL", pipe.settings.database_url)
     monkeypatch.setenv("DASHBOARD_SECRET", SECRET)
     get_settings.cache_clear()
-    sys.modules.pop("api.index", None)
+    sys.modules.pop("index", None)
     try:
-        module = importlib.import_module("api.index")
+        module = importlib.import_module("index")
         assert module.app.title == "BharatDesk dashboard"
     finally:
         get_settings.cache_clear()
-        sys.modules.pop("api.index", None)
+        sys.modules.pop("index", None)
 
 
 # --- deployment files -----------------------------------------------------------------------------
 
 
-def test_vercel_config_routes_everything_to_the_dashboard_function() -> None:
+def test_the_dashboard_is_the_entry_point_vercel_finds_first() -> None:
     cfg = json.loads((ROOT / "vercel.json").read_text(encoding="utf-8"))
-    assert cfg["rewrites"] == [{"source": "/(.*)", "destination": "/api/index"}]
-    assert (ROOT / "api" / "index.py").is_file()
-    assert "tests/**" in cfg["functions"]["api/index.py"]["excludeFiles"]
+    assert cfg["framework"] == "fastapi"
+    entry = (ROOT / "index.py").read_text(encoding="utf-8")
+    assert "create_dashboard_app" in entry
+    # Vercel's detection must not stumble onto the bot's app (app/main.py) or a stale function.
+    assert not (ROOT / "api").exists()
+    assert (ROOT / "app" / "main.py").is_file()  # the bot lives there, so index.py must win
 
 
 def test_secrets_and_local_data_can_never_be_uploaded_to_vercel() -> None:

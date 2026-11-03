@@ -30,7 +30,8 @@ Start the bot. It creates the tables on startup (`AUTO_MIGRATE`), or run `alembi
 Your existing SQLite data is not copied over; the Postgres database starts empty.
 
 **3. Import the repo in Vercel** (Add New → Project → pick this repository). Keep the defaults;
-`vercel.json` already routes every request to `api/index.py`.
+`vercel.json` selects the FastAPI preset and the root `index.py` is the entry point (the bot's own
+`app/main.py` is never served).
 
 **4. Add environment variables in Vercel** (Project → Settings → Environment Variables), never in
 the repository:
@@ -44,7 +45,7 @@ the repository:
 `PUBLIC_BASE_URL` is optional on Vercel (the production hostname is used automatically), but it
 **must be set on the bot** so the `/dashboard` link it sends points at Vercel.
 
-**5. Deploy**, then in Telegram send `/dashboard` to the bot (as the boss) and open the link.
+**5. Redeploy** (environment variables only apply to new deployments), then in Telegram send `/dashboard` to the bot (as the boss) and open the link.
 `https://<your-project>.vercel.app/health` should say `"status": "ok"`.
 
 ## What works and what does not
