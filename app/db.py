@@ -11,11 +11,9 @@ import asyncio
 import uuid
 from collections.abc import Sequence
 from pathlib import Path
-from typing import Any, TypeVar, cast
+from typing import TYPE_CHECKING, Any, TypeVar, cast
 from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
-from alembic import command
-from alembic.config import Config
 from sqlalchemy import ColumnElement, CursorResult, Select, delete, event, select, text, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import (
@@ -28,6 +26,9 @@ from sqlalchemy.pool import NullPool
 
 from app.models import AuditLog, ProcessedEvent, Tenant
 from app.models.base import TenantOwned
+
+if TYPE_CHECKING:
+    from alembic.config import Config
 
 T = TypeVar("T", bound=TenantOwned)
 
@@ -101,6 +102,8 @@ async def ping(engine: AsyncEngine) -> bool:
 
 
 def _alembic_config(url: str) -> Config:
+    from alembic.config import Config  # imported lazily: serverless deployments never migrate
+
     cfg = Config(str(PROJECT_ROOT / "alembic.ini"))
     cfg.set_main_option("script_location", str(PROJECT_ROOT / "migrations"))
     cfg.set_main_option("sqlalchemy.url", normalize_database_url(url).replace("%", "%%"))
@@ -110,6 +113,8 @@ def _alembic_config(url: str) -> Config:
 
 async def migrate_to_head(url: str) -> None:
     """Run Alembic in a worker thread (its async env.py owns its own event loop)."""
+    from alembic import command
+
     await asyncio.to_thread(command.upgrade, _alembic_config(url), "head")
 
 

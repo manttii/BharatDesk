@@ -4,8 +4,11 @@ from __future__ import annotations
 
 import importlib
 import json
+import os
 import re
+import subprocess
 import sys
+import tomllib
 from collections.abc import Iterator
 from pathlib import Path
 from typing import Any
@@ -173,3 +176,46 @@ def test_secrets_and_local_data_can_never_be_uploaded_to_vercel() -> None:
 def test_the_postgres_driver_is_pinned_for_the_deployment() -> None:
     reqs = (ROOT / "requirements.txt").read_text(encoding="utf-8")
     assert re.search(r"^asyncpg==\d", reqs, re.M)
+
+
+def test_the_dependencies_vercel_installs_are_declared_and_match_the_pinned_set() -> None:
+    """Vercel installs from pyproject.toml. With no list there it installed nothing and every
+    request failed, so the list is required and may not drift from requirements.txt."""
+    deps = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"][
+        "dependencies"
+    ]
+    assert deps and all("==" in d for d in deps)
+    pinned = {
+        line.strip().casefold()
+        for line in (ROOT / "requirements.txt").read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    }
+    for dep in deps:
+        assert dep.casefold() in pinned, f"{dep} is not pinned identically in requirements.txt"
+    names = {re.split(r"[\[=]", d)[0].casefold() for d in deps}
+    assert {"fastapi", "asyncpg", "sqlalchemy", "jinja2", "pyyaml", "gspread"} <= names
+
+
+def test_the_dashboard_imports_without_the_bots_heavy_dependencies() -> None:
+    """The deployed function must not need the bot's stack (aiogram, google-genai, PDF/OCR
+    libraries, alembic), so a lean install is enough and none of them is imported."""
+    code = (
+        "import sys; sys.path.insert(0, '.'); import index; "
+        "bad = [m for m in ('aiogram', 'google.genai', 'PIL', 'pypdfium2', 'pypdf', 'alembic', "
+        "'httpx', 'uvicorn') if m in sys.modules]; print('LOADED:', bad)"
+    )
+    env = {
+        **os.environ,
+        "DATABASE_URL": "postgres://u:p@127.0.0.1:1/db",
+        "DASHBOARD_SECRET": "x" * 40,
+    }
+    out = subprocess.run(  # noqa: S603
+        [sys.executable, "-c", code],
+        cwd=ROOT,
+        env=env,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert out.returncode == 0, out.stderr[-400:]
+    assert "LOADED: []" in out.stdout, out.stdout

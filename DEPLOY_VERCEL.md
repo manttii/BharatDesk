@@ -48,6 +48,13 @@ the repository:
 **5. Redeploy** (environment variables only apply to new deployments), then in Telegram send `/dashboard` to the bot (as the boss) and open the link.
 `https://<your-project>.vercel.app/health` should say `"status": "ok"`.
 
+## How the build works
+Vercel installs from the `dependencies` list in `pyproject.toml` (not `requirements.txt`). That list
+is deliberately small: only what the dashboard needs, so the function stays light and cold starts
+are quick. `requirements.txt` stays the full pinned set for the bot, the tests and CI, and a test
+keeps the two in sync. The bot's heavy libraries (aiogram, google-genai, PDF/OCR) are not installed
+on Vercel.
+
 ## What works and what does not
 - Works: the live summary, visit feed, approvals view, sheet/sync status, and corrections, all
   through the same signed, expiring sign-in link as before.

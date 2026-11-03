@@ -1,7 +1,24 @@
 [project]
 name = "bharatdesk"
-version = "0.1.0"
+version = "0.4.0"
 requires-python = ">=3.11"
+# ONLY what the Vercel-hosted dashboard needs: Vercel installs from this list, not from
+# requirements.txt (which is the full set for the bot, the tests and CI). Every pin here must
+# equal its pin in requirements.txt; tests/test_vercel_app.py enforces that.
+dependencies = [
+  "fastapi==0.162.0",
+  "pydantic==2.13.5",
+  "pydantic-settings==2.16.2",
+  "SQLAlchemy[asyncio]==2.1.6",
+  "greenlet==3.5.6",
+  "asyncpg==0.32.0",
+  "Jinja2==3.1.6",
+  "PyYAML==6.0.3",
+  "structlog==26.1.0",
+  "python-multipart==0.0.33",
+  "tzdata==2026.6",
+  "gspread==6.2.1",
+]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
