@@ -21,6 +21,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 SENSITIVE_NAME = re.compile(r"KEY|TOKEN|SECRET|PASSWORD|JSON|CREDENTIAL")
+CREDENTIAL_URL = re.compile(r"://[^/\s:@]+:[^@\s/]+@")
 MIN_SECRET_LEN = 12  # shorter values (e.g. "true", "60") are settings, not secrets
 SKIP_DIRS = {".git", ".venv", "venv", "__pycache__", ".mypy_cache", ".pytest_cache", ".ruff_cache",
              "media", "node_modules"}  # fmt: skip
@@ -32,6 +33,7 @@ SHAPES = {
     "Telegram bot token": re.compile(r"\b\d{8,10}:[A-Za-z0-9_\-]{30,}"),
     "private key block": re.compile(r"-----BEGIN [A-Z ]*PRIVATE KEY-----"),
     "OpenAI-style key": re.compile(r"\bsk-[A-Za-z0-9]{20,}"),
+    "database URL with a password": re.compile(r"://[^/\s:@]+:[^@\s/]{8,}@"),
 }
 
 
@@ -45,8 +47,10 @@ def env_secrets(env_path: Path) -> dict[str, str]:
             continue
         name, value = line.split("=", 1)
         name, value = name.strip(), value.strip().strip("'\"")
-        if SENSITIVE_NAME.search(name) and len(value) >= MIN_SECRET_LEN:
-            found[name] = value
+        if len(value) >= MIN_SECRET_LEN and (
+            SENSITIVE_NAME.search(name) or CREDENTIAL_URL.search(value)
+        ):
+            found[name] = value  # a URL with user:password@ is a secret whatever it is called
     return found
 
 

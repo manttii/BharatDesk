@@ -38,3 +38,23 @@ def test_provider_shaped_keys_are_caught(tmp_path: Path) -> None:
 def test_missing_gitignore_entry_is_reported(tmp_path: Path) -> None:
     root = _project(tmp_path, gitignore="*.pyc\n")
     assert any(".gitignore" in p for p in scan(root))
+
+
+def test_a_database_url_password_is_a_secret_even_though_the_name_is_not(tmp_path: Path) -> None:
+    (tmp_path / ".gitignore").write_text(".env\n")
+    url = "postgresql://owner:" + "s3cretPassw0rd" + "@db.example.com/app?sslmode=require"
+    (tmp_path / ".env").write_text(f"DATABASE_URL={url}\n")
+    (tmp_path / "notes.md").write_text(f"connect with {url}\n")
+    problems = scan(tmp_path)
+    assert any("notes.md:1" in p and "DATABASE_URL" in p for p in problems)
+    assert all("s3cretPassw0rd" not in p for p in problems)
+
+
+def test_a_url_with_a_real_looking_password_is_caught_by_shape_but_placeholders_pass(
+    tmp_path: Path,
+) -> None:
+    (tmp_path / ".gitignore").write_text(".env\n")
+    (tmp_path / "x.md").write_text("postgres://owner:" + "longpasswordhere" + "@host/db\n")
+    assert any("database URL" in p for p in scan(tmp_path))
+    (tmp_path / "x.md").write_text("postgres://user:pass@host/db\n")  # a documentation placeholder
+    assert scan(tmp_path) == []
