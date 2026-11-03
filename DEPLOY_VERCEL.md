@@ -48,6 +48,20 @@ the repository:
 **5. Redeploy** (environment variables only apply to new deployments), then in Telegram send `/dashboard` to the bot (as the boss) and open the link.
 `https://<your-project>.vercel.app/health` should say `"status": "ok"`.
 
+## Using Vercel's Neon integration (the easy way to get a database)
+In the Vercel project open **Storage → Create Database → Neon** and connect it to the project.
+Vercel then adds `DATABASE_URL` (and related variables) to the project by itself, so you only add
+`DASHBOARD_SECRET` and `ENV=prod` by hand. For the bot, copy the connection string from the Neon
+console into your local `.env` (never into Git or chat).
+
+## The new database is empty: create the tables once
+`/health` can say `ok` while the dashboard pages still fail, because the tables do not exist yet.
+Create them once, from your computer, with the bot's `.env` pointing at the Neon database:
+```
+python -m alembic upgrade head
+```
+(or just start the bot once; it runs the same migrations on startup).
+
 ## How the build works
 Vercel installs from the `dependencies` list in `pyproject.toml` (not `requirements.txt`). That list
 is deliberately small: only what the dashboard needs, so the function stays light and cold starts
