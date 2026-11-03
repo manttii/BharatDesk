@@ -1,0 +1,11 @@
+<div class="rounded-lg bg-white p-4 shadow-sm border border-slate-200">
+  <h2 class="font-semibold mb-2">Google Sheet</h2>
+  {% if sync.configured %}
+    <p class="text-sm"><a class="text-blue-700 underline" href="{{ sync.url }}" target="_blank" rel="noopener noreferrer">Open the sheet</a></p>
+    <p class="text-sm text-slate-600 mt-1">{{ sync.done }} synced &middot; {{ sync.pending }} waiting &middot;
+      <span class="{{ 'text-rose-700 font-medium' if sync.failed else '' }}">{{ sync.failed }} failed</span></p>
+    {% if sync.last_error %}<p class="text-xs text-rose-700 mt-1">Last error: {{ sync.last_error }}</p>{% endif %}
+  {% else %}
+    <p class="text-sm text-slate-500">No sheet connected. Send <code>/sheet &lt;link&gt;</code> to the bot.</p>
+  {% endif %}
+</div>

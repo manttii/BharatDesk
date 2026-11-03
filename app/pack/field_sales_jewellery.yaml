@@ -1,0 +1,328 @@
+# Pack for the ONE supported customer type: B2B gold/jewellery wholesaler field sales.
+# Phase 0 carries only user-facing strings. Intents, required fields, sanity bounds and
+# vocabulary are added in later phases.
+# Strings are Roman-script Hindi ("Hinglish") to match the product brief's examples;
+# switch to Devanagari here without touching code.
+name: field_sales_jewellery
+version: 1
+
+strings:
+  btn_yes: "Haan"
+  btn_no: "Nahi"
+  btn_accept: "Sahmat hoon"
+  btn_decline: "Sahmat nahi"
+
+  consent_notice: |
+    Namaste! BharatDesk aapki visit aur order ki jaankari record karta hai.
+
+    Kya record hota hai: aapke voice note, photo aur message, unka text, aur visit/order ka vivaran.
+    Kyon: aapke boss ko sahi hisaab dikhane aur approval dene ke liye.
+    Kaun dekhta hai: aapka boss/manager aur aapki company.
+    Wapas lena: kabhi bhi /stop bhejein ya "band karo" likhein, processing turant band ho jayegi. Apna data export ya delete karwane ke liye boss se kahein.
+
+    Kya aap sahmat hain?
+  consent_accepted: "Dhanyavaad! Ab aap apna visit voice note ya message bhej sakte hain. Madad ke liye /help likhein."
+  consent_declined: "Theek hai. Sahmati ke bina bot kaam nahi karega. Jab chahein /start se dobara shuru karein."
+  consent_required: "Pehle sahmati dena zaroori hai."
+  consent_withdrawn: "Aapki sahmati wapas le li gayi hai. Ab koi bhi processing nahi hogi. Dobara shuru karne ke liye /start likhein."
+  consent_toast: "Dhanyavaad"
+
+  not_registered: "Aap is bot par registered nahi hain. Apne boss se invite link maangein."
+  account_inactive: "Aapka account abhi active nahi hai. Apne boss se baat karein."
+  invite_invalid: "Ye invite link kaam nahi kar raha (expire ho gaya ya pehle hi use ho chuka). Boss se naya link maangein."
+  welcome_back: "Namaste {name}! Bot taiyaar hai. Madad ke liye /help likhein."
+  welcome_bound: "Namaste {name}! Aap {company} ke saath jud gaye hain."
+  rate_limited: "Bahut zyada messages. Thoda ruk kar dobara bhejein."
+  error_generic: "Kuch gadbad ho gayi. Kripya dobara try karein."
+  unsupported: "Abhi ye type support nahi hai. Text message bhejein."
+  bills_reading: "Bill mil gaya. Padh raha hoon, thoda time lag sakta hai."
+  bills_too_big: "File bahut badi hai. Chhoti PDF bhejein."
+  bills_pdf_only: "Sirf PDF bhejein, ya bill ki photo jiske caption mein 'bill' likha ho."
+  bills_download_failed: "File download nahi ho payi. Dobara bhejein."
+  bills_file_error: "Ye file padh nahi sakta: {reason}."
+  bills_summary: "{total} page padhe: {ready} sahi, {review} dekhne wale, {bad} padh nahi paaye."
+  bills_sent_to_boss: "Boss ko bhej diya, wahi confirm karenge."
+  bills_confirm_prompt: "{ready} sahi bills confirm karein? Sheet par chale jayenge."
+  btn_bills_confirm: "Haan, {ready} confirm karo"
+  bills_confirmed: "{count} bills save ho gaye. Sheet par jaldi dikhenge."
+  bills_already: "Ye pehle hi ho chuka hai."
+  bills_more: "{count} aur bills baaki hain: /bills se dekhein."
+  bills_review_item: "Page {page}: {party} | bill {bill_no} | {total}
+Dhyan: {reasons}"
+  bills_unreadable_item: "Page {page}: padh nahi paya. Saaf photo ya PDF dobara bhejein."
+  btn_bill_accept: "Aise hi rakho"
+  btn_bill_reject: "Hatao"
+  bills_accepted: "Bill rakh liya."
+  bills_rejected: "Bill hata diya."
+  bills_none_pending: "Koi bill pending nahi hai."
+  reverse_header: "Kaun sa bill ulta karna hai? (sirf confirmed bills)"
+  reverse_item: "{party} | bill {bill_no} | {date} | {total}"
+  btn_reverse: "Ulta karo"
+  reverse_ask: "Pakka? Ye bill ulta hoga: {label}. Stock aur sheet se hat jayega."
+  btn_reverse_yes: "Haan, ulta karo"
+  reverse_done: "Bill ulta kar diya: {label}. Stock theek ho gaya."
+  reverse_none: "Koi confirmed bill nahi mila."
+  reverse_cancelled: "Theek hai, bill waisa hi hai."
+  stock_header: "Stock (sirf confirmed bills ke hisaab se):"
+  stock_line: "{name}: {qty}"
+  stock_minus_tag: " (minus: bika zyada, kharid ka bill baaki ho sakta hai)"
+  stock_more: "+{count} aur items: sheet ke Stock tab mein dekhein."
+  stock_empty: "Abhi koi confirmed bill nahi hai, isliye stock nahi bata sakta. PDF bill bhejein."
+  stock_none_for: "'{name}' naam ka koi item nahi mila."
+  stock_footnote: "{pending} bill abhi review mein hain, stock mein ginti nahi."
+  today_header: "Aaj ({date}) ka hisaab:"
+  today_sales: "Bikri: {count} bills, {total}"
+  today_purchases: "Kharid: {count} bills, {total}"
+  today_top: "Sabse zyada bika: {names}"
+  today_none: "Aaj ({date}) ke koi confirmed bill nahi hain."
+  today_unknown_total: "{count} bill ka total nahi mila, rakam mein shamil nahi."
+  today_pending: "{pending} bill review mein hain, ginti mein nahi."
+  bill_flag_not_a_bill: "ye bill nahi lagta"
+  bill_flag_line_math_mismatch: "ek line ka hisaab nahi mil raha"
+  bill_flag_subtotal_mismatch: "subtotal nahi mil raha"
+  bill_flag_total_mismatch: "total nahi mil raha"
+  bill_flag_total_missing: "total nahi mila"
+  bill_flag_unusually_large: "rakam bahut badi hai"
+  bill_flag_no_content: "kuch likha nahi mila"
+  bill_flag_missing_party: "party ka naam nahi mila"
+  bill_flag_missing_bill_no: "bill number nahi mila"
+  bill_flag_date_unresolved: "tareekh samajh nahi aayi"
+  bill_flag_date_missing: "tareekh nahi mili"
+  bill_flag_low_confidence: "kuch likha saaf nahi hai"
+  bill_flag_duplicate: "ye bill pehle aa chuka hai"
+  bill_flag_other: "dekh lein"
+  echo: "Aapne likha: {text}"
+
+  help_worker: |
+    Aap ye kar sakte hain:
+    /stock [item] — stock kitna bacha hai
+    /help — madad
+    /stop — sahmati wapas lein
+  help_boss: |
+    Aap ye kar sakte hain:
+    /addworker <naam> — naya worker jodein
+    /team — team ki list
+    /rate <rate> — aaj ka rate (10 gram)
+    /sheet <link> — Google Sheet jodein
+    /bills — pending bills dekhein (PDF bhejne par bills padhe jaate hain)
+    /stock [item] — stock kitna bacha hai
+    /reverse [bill no] — confirmed bill ulta karein
+    /today — aaj ki bikri aur kharid
+    /dashboard — dashboard link
+    /dailyreport <ghanta|off> — roz ka summary
+    /stop — sahmati wapas lein
+    /help — madad
+  unknown_command: "Ye command samajh nahi aaya. /help dekhein."
+  boss_only: "Ye command sirf boss ke liye hai."
+
+  addworker_usage: "Naam bhi likhein, jaise: /addworker Ramesh Kumar"
+  addworker_bad_name: "Naam 2 se 60 akshar ka hona chahiye, bina special characters ke."
+  addworker_confirm: "Naya worker: {name}. Link banana hai?"
+  addworker_done: |
+    {name} ke liye invite link taiyaar hai (24 ghante mein expire, sirf ek baar chalega):
+    {link}
+  addworker_cancelled: "Theek hai, cancel kar diya."
+  action_expired: "Ye request expire ho chuki hai ya pehle hi poori ho chuki hai."
+  action_toast_done: "Ho gaya"
+  action_toast_cancelled: "Cancel"
+
+  team_header: "Team:"
+  team_line: "{name} ({role}) — {status}"
+  team_status_invited: "link bheja, join nahi hua"
+  team_status_pending_consent: "joined, sahmati baaki"
+  team_status_active: "active"
+  team_status_withdrawn: "sahmati wapas li"
+  team_empty: "Abhi koi team member nahi hai."
+
+  # Policy violation reasons shown to the rep and the boss (Hindi). Amounts arrive
+  # pre-formatted (Indian grouping) so templates never do arithmetic.
+  policy_rate_below_floor: "Rate {quoted} hai, jo benchmark {benchmark} se {pct}% se zyada kam hai. Kam se kam {floor} hona chahiye."
+  policy_discount_over_cap: "Discount {discount} ({pct}%) hai, jo limit {pct_cap}% se zyada hai."
+  policy_credit_over_limit: "Is order ke baad udhaar {total} ho jayega, jo limit {limit} se zyada hai."
+  policy_order_over_max: "Order {value} hai, jo bina approval ki limit {limit} se zyada hai."
+  policy_benchmark_missing: "Aaj ka benchmark rate set nahi hai, isliye approval chahiye."
+  policy_benchmark_stale: "Benchmark rate {age_h} ghante purana hai (limit {max_h} ghante), isliye approval chahiye."
+  policy_benchmark_future: "Benchmark rate ka samay galat hai, isliye approval chahiye."
+  policy_unit_mismatch: "Rate ki unit ({quoted_unit}) benchmark ki unit ({benchmark_unit}) se alag hai, isliye approval chahiye."
+  policy_fact_missing: "Jaanch ke liye {fact} ki jaankari nahi mili, isliye approval chahiye."
+  policy_config_invalid: "Policy rule sahi se set nahi hai, isliye approval chahiye."
+
+  # --- notes: voice / text intake ---
+  not_configured: "Abhi voice/text note processing chalu nahi hai."
+  voice_too_short: "Voice note bahut chhota hai. Kripya dobara bolkar bhejein."
+  voice_too_long: "Voice note bahut lamba hai (zyada se zyada {max_s} second). Chhote hisson mein bhejein."
+  voice_bad_type: "Ye audio format support nahi hai. Telegram ka voice note bhejein."
+  media_too_large: "File bahut badi hai."
+  media_download_failed: "Voice note download nahi ho paya. Dobara bhejein."
+  stt_unavailable: "Voice samajhne ki suvidha abhi chalu nahi hai. Text mein likhkar bhejein."
+  stt_failed: "Voice samajh nahi aayi. Dobara bhejein ya likhkar bhejein."
+  empty_transcript: "Kuch sunai nahi diya. Dobara bolkar bhejein."
+  llm_unavailable: "Jaankari nikalne ki suvidha abhi chalu nahi hai. Thodi der baad try karein."
+  extract_failed: "Baat samajh nahi aayi. Kripya dobara bhejein."
+  unknown_intent: "Main samajh nahi paya. Visit ya order ki jaankari voice note ya text mein bhejein."
+  intent_unsupported: "Ye abhi chalu nahi hai."
+  cancel_done: "Theek hai, cancel kar diya."
+  note_stranded: "Aapka pichla note process nahi ho paya. Kripya use dobara bhejein."
+
+  # --- daily report (boss) ---
+  daily_report: |
+    Aaj ka report ({date})
+    Visits: {visits}
+    Confirm order ki keemat: {value}
+    Approval pending: {pending} ({pending_value})
+    Rep-wise: {reps}
+    Sheet sync fail: {failed}
+  dailyreport_current: "Daily report: {state}."
+  dailyreport_on: "roz {hour}:00 baje"
+  dailyreport_off: "band"
+  dailyreport_set: "Daily report ab roz {hour}:00 baje aayega."
+  dailyreport_disabled: "Daily report band kar diya."
+  dailyreport_usage: "Jaise: /dailyreport 20 (raat 8 baje) ya /dailyreport off"
+
+  # --- read-back (every value is confirmed before it is saved) ---
+  readback_new_client: "{name} (naya client)"
+  readback_rate: "rate {amount} (10 gram)"
+  readback_advance: "advance {amount}"
+  readback_pending: "baaki {amount}"
+  readback_delivery: "delivery {date}"
+  readback_followup: "follow-up {date}"
+  readback_question: "Sahi hai?"
+  readback_warn: "Dhyan: {fields} pakke nahi hain, kripya dhyan se check karein."
+  btn_edit: "Sudharo"
+  label_client: "client"
+  label_weight: "wazan"
+  label_value: "keemat"
+  label_rate: "rate"
+  label_advance: "advance"
+  label_pending: "baaki"
+  label_delivery: "delivery date"
+  label_followup: "follow-up date"
+  label_other: "jaankari"
+
+  # --- self-healing: ONE short question at a time ---
+  ask_client: "Kis client ke paas gaye the?"
+  ask_value: "Order ki total keemat kitni thi?"
+  ask_rate: "Rate kya tha (10 gram ka)?"
+  ask_retry: "Samajh nahi aaya. {question}"
+  slot_giveup: "Jaankari poori nahi mil payi. Kripya poora note dobara bhejein."
+  ask_correction: "Theek hai. Sahi jaankari ke saath poora note dobara bhejein (voice ya text)."
+  state_expired: "Ye request expire ho gayi. Kripya note dobara bhejein."
+  ask_client_choice: "Kaun sa client? \"{name}\""
+  btn_new_client: "Naya client"
+  discarded: "Theek hai, ye record save nahi kiya."
+
+  # --- commit ---
+  committed: "Save ho gaya: {summary}. Aaj ki visits: {count}."
+  awaiting_approval: "Boss ki approval ke liye bhej diya gaya hai. Wajah: {reason}"
+  approval_held: "Boss abhi bot par join nahi hue, isliye ye hold par hai. Boss se bot Start karne ko kahein."
+
+  # --- approvals (boss side) ---
+  approval_request_boss: |
+    Approval chahiye
+    Rep: {rep}
+    Client: {client}
+    {summary}
+    Wajah:
+    {reasons}
+    Voice: "{excerpt}"
+  approval_reminder_boss: |
+    Yaad dilana: ye approval abhi pending hai.
+    Rep: {rep}
+    Client: {client}
+    {summary}
+    Wajah:
+    {reasons}
+  btn_approve: "Approve"
+  btn_reject: "Reject"
+  btn_counter: "Counter"
+  approval_approved_rep: "Boss ne approve kar diya: {summary}. Save ho gaya."
+  approval_rejected_rep: "Boss ne reject kar diya: {summary}."
+  approval_countered_rep: "Boss ne naye terms par approve kiya ({change}): {summary}. Save ho gaya."
+  approval_done_boss: "Ho gaya: {status}."
+  approval_already: "Ye request pehle hi nipat chuki hai."
+  approval_expired_rep: "Boss ne {hours} ghante mein jawab nahi diya, isliye ye request expire ho gayi: {summary}. Zaroorat ho to dobara bhejein."
+  approval_expired_boss: "Request expire ho gayi: {rep} / {client}. {summary}"
+  counter_prompt_rate: "Naya rate bhejein (10 gram ka), jaise 74000."
+  counter_prompt_discount: "Naya discount % bhejein, jaise 0.3%."
+  counter_bad: "Samajh nahi aaya. {prompt}"
+  counter_readback_rate: "Counter: rate {old} se {new}. Lagu karein?"
+  counter_readback_discount: "Counter: discount {pct}%, order ki nayi keemat {value}. Lagu karein?"
+  counter_change_rate: "rate {old} -> {new}"
+  counter_change_discount: "discount {pct}%, keemat {value}"
+
+  # --- benchmark rate (boss only; read back before it is applied) ---
+  benchmark_none: "Abhi koi rate set nahi hai."
+  benchmark_current: "Aaj ka rate: {rate} (10 gram), {age_h} ghante pehle set hua."
+  benchmark_confirm: "Aaj ka rate {rate} (10 gram) set karna hai?"
+  benchmark_set: "Rate set ho gaya: {rate} (10 gram)."
+  benchmark_out_of_range: "Ye rate ({rate}) sahi range se bahar hai. Dobara bhejein."
+  benchmark_ask: "Rate kitna hai (10 gram ka)? Jaise: /rate 75200"
+  benchmark_usage: "Rate bhi likhein, jaise: /rate 75200"
+  benchmark_bad: "Rate samajh nahi aaya. Jaise: /rate 75200"
+
+  # --- client dossier: built only from saved visits, never generated ---
+  dossier_ask_name: "Kis client ka status chahiye?"
+  dossier_not_found: "\"{name}\" naam ka koi client nahi mila."
+  dossier_ambiguous: "Kaun sa client? {names}. Poora naam likhein."
+  dossier_empty: "{client} ka abhi koi save kiya hua record nahi hai."
+  dossier_line1: "{client}: {visits} visit, aakhri visit {last} ({rep}). Kul order {total}."
+  dossier_line2: "Baaki (udhaar): {outstanding}. Aakhri order {last_order}, advance {last_advance}."
+  dossier_line3: "Agli delivery: {delivery}. Follow-up: {followup}.{pending}"
+  dossier_none: "koi nahi"
+  dossier_pending: " Approval pending: {count}."
+
+  # --- photos / handwritten slips ---
+  photo_too_small: "Photo bahut chhoti hai. Saaf, bada photo dobara bhejein."
+  photo_too_large: "Photo bahut badi hai."
+  photo_bad_type: "Ye photo format support nahi hai."
+  photo_unclear: "Photo saaf nahi hai. Saaf photo dobara bhejein (poori slip dikhe, roshni mein)."
+  photo_duplicate: "Ye photo pehle hi bheji ja chuki hai."
+  ask_slip_total: "Slip par total {written} likha hai, par items ka jod {computed} aata hai. Sahi total kya hai?"
+
+  # --- Google Sheets ---
+  sheet_current: "Sheet: {url}
+Sync: {pending} baaki, {failed} fail."
+  sheet_none: "Abhi koi Google Sheet jodi nahi hai. /sheet <link ya id> likhein. Sheet ko is email ke saath share karein (Editor): {email}"
+  sheet_no_provider: "Google Sheets sync abhi chalu nahi hai (service account set nahi hai)."
+  sheet_confirm: "Is Google Sheet se judna hai? {id}"
+  sheet_set: "Sheet set ho gayi."
+  sheet_check_ok: "Sheet connect ho gayi. Ab confirmed records wahan jayenge."
+  sheet_check_fail: "Sheet tak access nahi mila. Sheet ko {email} ke saath Editor ke roop mein share karein."
+  sheet_bad: "Sheet ka link ya id samajh nahi aaya."
+  sync_failed_boss: "Sheet sync fail ho gaya ({count} baar koshish): {client}. Sheet ka access check karein."
+
+  # --- dashboard ---
+  dashboard_link: "Dashboard link ({minutes} minute mein expire hoga):
+{link}"
+  dashboard_not_configured: "Dashboard abhi chalu nahi hai (DASHBOARD_SECRET / PUBLIC_BASE_URL set nahi)."
+
+strings_en:
+  policy_config_invalid: "A policy rule is misconfigured, so approval is required."
+  policy_rate_below_floor: "Quoted rate {quoted} is more than {pct}% below the benchmark {benchmark}. Minimum allowed is {floor}."
+  policy_discount_over_cap: "Discount {discount} ({pct}%) exceeds the {pct_cap}% cap."
+  policy_credit_over_limit: "Outstanding credit would reach {total}, above the limit of {limit}."
+  policy_order_over_max: "Order value {value} exceeds the no-approval limit of {limit}."
+  policy_benchmark_missing: "No benchmark rate is set, so approval is required."
+  policy_benchmark_stale: "The benchmark rate is {age_h} hours old (maximum {max_h}), so approval is required."
+  policy_benchmark_future: "The benchmark rate timestamp is in the future, so approval is required."
+  policy_unit_mismatch: "Quoted rate unit ({quoted_unit}) differs from the benchmark unit ({benchmark_unit}), so approval is required."
+  policy_fact_missing: "Required input '{fact}' is unavailable, so approval is required."
+
+# Sanity bounds: a value outside these is never auto-confirmed (and is flagged in the read-back).
+# Integers only. Rates are per 10 g. Tune against real data.
+bounds:
+  weight_mg_min: 1000            # 1 g
+  weight_mg_max: 50000000        # 50 kg
+  value_paise_min: 10000         # Rs 100
+  value_paise_max: 5000000000    # Rs 5 crore
+  rate_paise_per_10g_min: 2000000    # Rs 20,000 per 10 g
+  rate_paise_per_10g_max: 20000000   # Rs 2,00,000 per 10 g
+  max_future_days: 365
+  max_past_days: 400
+
+# Domain words handed to speech-to-text as spelling hints (not instructions).
+vocabulary: [kundan, jadau, polki, meenakari, tola, karat, "making charges", necklace, haar,
+  "rani haar", mangalsutra, jhumka, bangles, kada, payal, chain, ring, bali, sets, advance,
+  delivery, hallmark, "22 karat", "24 karat", "18 karat"]
+
+months_en: [Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec]

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>{{ tenant }} dashboard</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/htmx.org@2.0.4"></script>
+</head>
+<body class="bg-slate-50 text-slate-900">
+<main class="mx-auto max-w-6xl p-4 space-y-4">
+  <header>
+    <h1 class="text-xl font-semibold">{{ tenant }}</h1>
+    <p class="text-sm text-slate-500">Live view for the owner. Updates every 10 seconds. Read-only, except correcting confirmed records.</p>
+  </header>
+
+  <section id="summary" hx-get="/dashboard/partials/summary" hx-trigger="every 10s" hx-swap="innerHTML">
+    {% include "_summary.html" %}
+  </section>
+
+  <div class="grid gap-4 md:grid-cols-2">
+    <section id="approvals" hx-get="/dashboard/partials/approvals" hx-trigger="every 10s" hx-swap="innerHTML">
+      {% include "_approvals.html" %}
+    </section>
+    <section id="sync" hx-get="/dashboard/partials/sync" hx-trigger="every 10s" hx-swap="innerHTML">
+      {% include "_sync.html" %}
+    </section>
+  </div>
+
+  <section id="feed" hx-get="/dashboard/partials/feed" hx-trigger="every 10s" hx-swap="innerHTML">
+    {% include "_feed.html" %}
+  </section>
+</main>
+</body>
+</html>

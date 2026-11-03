@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BharatDesk bills</title>
+<style>
+  :root { --bg:#f6f7f9; --card:#fff; --ink:#1b1f24; --mute:#5b6570; --line:#dde1e6; --accent:#0b6b5c; --warn:#a15c00; --bad:#b3261e; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#14181c; --card:#1d2227; --ink:#e8ebee; --mute:#98a2ad; --line:#2d343b; --accent:#3fbfa8; --warn:#e0a040; --bad:#f2837c; } }
+  * { box-sizing: border-box; }
+  body { margin:0; font:15px/1.45 system-ui, sans-serif; background:var(--bg); color:var(--ink); }
+  main { max-width:980px; margin:0 auto; padding:16px; }
+  h1 { font-size:20px; margin:4px 0 2px; } .sub { color:var(--mute); margin:0 0 14px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px; margin:12px 0; }
+  .row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+  button { font:inherit; padding:8px 12px; border-radius:8px; border:1px solid var(--line); background:var(--card); color:var(--ink); cursor:pointer; }
+  button.primary { background:var(--accent); color:#fff; border-color:var(--accent); }
+  button:disabled { opacity:.5; cursor:default; }
+  table { width:100%; border-collapse:collapse; font-size:14px; }
+  th, td { text-align:left; padding:8px 6px; border-bottom:1px solid var(--line); vertical-align:top; }
+  th { color:var(--mute); font-weight:600; }
+  td.num { text-align:right; font-variant-numeric:tabular-nums; }
+  .pill { display:inline-block; padding:1px 8px; border-radius:99px; border:1px solid var(--line); font-size:12.5px; }
+  .ready { color:var(--accent); } .needs_review { color:var(--warn); } .failed, .unreadable, .rejected { color:var(--bad); }
+  .flag { color:var(--warn); font-size:13px; }
+  .scroll { overflow-x:auto; }
+  @media (max-width:640px) { main { padding:12px; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Bills: upload and review</h1>
+  <p class="sub">Upload a PDF or photo. Every page is read, the arithmetic is re-checked by code, and clean bills wait for your one-tap confirmation. Confirmed bills go to your Google Sheet. Demo tenant only.</p>
+
+  <div class="card">
+    <div class="row">
+      <input type="file" id="file" accept="application/pdf,image/jpeg,image/png">
+      <button class="primary" id="upload">Read bills</button>
+      <span id="msg" class="sub" role="status"></span>
+    </div>
+  </div>
+
+  <div class="card" id="result" hidden>
+    <div class="row">
+      <strong id="summary"></strong>
+      <button class="primary" id="confirm" disabled>Confirm all clean bills</button>
+    </div>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Page</th><th>Type</th><th>Party</th><th>Bill no</th><th>Date</th><th>Total</th><th>Status</th><th></th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+<script>
+"use strict";
+let batch = null;
+const $ = (id) => document.getElementById(id);
+
+function inr(paise) {
+  if (paise === null || paise === undefined) return "";
+  const rupees = Math.trunc(paise / 100), rem = paise % 100;
+  let s = String(rupees), out = s.slice(-3);
+  s = s.slice(0, -3);
+  while (s.length) { out = s.slice(-2) + "," + out; s = s.slice(0, -2); }
+  return "₹" + out + (rem ? "." + String(rem).padStart(2, "0") : "");
+}
+
+function cell(text, cls) {
+  const td = document.createElement("td");
+  td.textContent = text ?? "";   // untrusted document text: never innerHTML
+  if (cls) td.className = cls;
+  return td;
+}
+
+function render(data) {
+  batch = data.batch_id;
+  const tbody = $("rows"); tbody.replaceChildren();
+  for (const b of data.bills) {
+    const tr = document.createElement("tr");
+    tr.append(cell(b.page), cell(b.type), cell(b.party), cell(b.bill_no), cell(b.date), cell(inr(b.total_paise), "num"));
+    const st = document.createElement("td");
+    const pill = document.createElement("span"); pill.className = "pill " + b.status; pill.textContent = b.status;
+    st.append(pill);
+    for (const f of b.flags) {
+      const d = document.createElement("div"); d.className = "flag";
+      d.textContent = f.reason + (f.field ? " (" + f.field + ")" : "");
+      st.append(d);
+    }
+    tr.append(st);
+    const act = document.createElement("td");
+    if (b.status === "needs_review") {
+      const ok = document.createElement("button"); ok.textContent = "Accept as is";
+      ok.onclick = () => decide(b.id, true, tr);
+      act.append(ok, " ");
+    }
+    if (["ready", "needs_review", "unreadable", "failed"].includes(b.status)) {
+      const no = document.createElement("button"); no.textContent = "Reject";
+      no.onclick = () => decide(b.id, false, tr);
+      act.append(no);
+    }
+    tr.append(act);
+    tbody.append(tr);
+  }
+  const c = data.counts;
+  $("summary").textContent = data.bills.length + " pages: " + (c.ready || 0) + " clean, " + (c.needs_review || 0) + " need review, " + ((c.unreadable || 0) + (c.failed || 0)) + " unreadable";
+  $("confirm").disabled = !(c.ready > 0);
+  $("confirm").textContent = "Confirm " + (c.ready || 0) + " clean bills";
+  $("result").hidden = false;
+}
+
+async function post(url, body) {
+  const r = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  if (!r.ok) throw new Error((await r.json().catch(() => ({}))).detail || r.statusText);
+  return r.json();
+}
+
+async function decide(id, accept, tr) {
+  await post("/sandbox/bills/decide", { bill_id: id, accept });
+  tr.querySelectorAll("button").forEach((b) => (b.disabled = true));
+  tr.querySelector(".pill").textContent = accept ? "confirmed" : "rejected";
+}
+
+$("upload").onclick = async () => {
+  const f = $("file").files[0];
+  if (!f) { $("msg").textContent = "Choose a PDF or photo first."; return; }
+  $("upload").disabled = true; $("msg").textContent = "Reading pages… this can take a minute.";
+  try {
+    const fd = new FormData(); fd.append("file", f);
+    const r = await fetch("/sandbox/bills/upload", { method: "POST", body: fd });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.detail || r.statusText);
+    $("msg").textContent = ""; render(data);
+  } catch (e) { $("msg").textContent = "Could not read: " + e.message; }
+  $("upload").disabled = false;
+};
+
+$("confirm").onclick = async () => {
+  $("confirm").disabled = true;
+  try {
+    const r = await post("/sandbox/bills/confirm", { batch_id: batch });
+    $("msg").textContent = r.confirmed + " bills confirmed. They reach the sheet within about a minute.";
+    document.querySelectorAll("#rows .pill.ready").forEach((p) => { p.className = "pill confirmed"; p.textContent = "confirmed"; });
+  } catch (e) { $("msg").textContent = e.message; $("confirm").disabled = false; }
+};
+</script>
+</body>
+</html>

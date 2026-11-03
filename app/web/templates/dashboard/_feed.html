@@ -1,0 +1,31 @@
+<div class="rounded-lg bg-white shadow-sm border border-slate-200 overflow-x-auto">
+  <h2 class="font-semibold p-4 pb-2">Live feed</h2>
+  <table class="min-w-full text-sm">
+    <thead class="text-left text-xs uppercase text-slate-500">
+      <tr><th class="px-4 py-2">Time</th><th class="px-2 py-2">Rep</th><th class="px-2 py-2">Client</th>
+          <th class="px-2 py-2">Weight</th><th class="px-2 py-2">Amount</th><th class="px-2 py-2">Status</th>
+          <th class="px-2 py-2">What was said</th><th class="px-2 py-2"></th></tr>
+    </thead>
+    <tbody>
+    {% for r in feed %}
+      <tr class="border-t border-slate-100 align-top">
+        <td class="px-4 py-2 whitespace-nowrap">{{ r.time }}</td>
+        <td class="px-2 py-2">{{ r.rep }}</td>
+        <td class="px-2 py-2">{{ r.client }}{% if r.corrected %} <span class="text-xs text-slate-500">(corrected)</span>{% endif %}</td>
+        <td class="px-2 py-2 whitespace-nowrap">{{ r.weight }}</td>
+        <td class="px-2 py-2 whitespace-nowrap">{{ r.amount }}</td>
+        <td class="px-2 py-2"><span class="rounded px-2 py-0.5 text-xs {{ r.status_class }}">{{ r.status }}</span></td>
+        <td class="px-2 py-2 max-w-xs">
+          {% if r.transcript %}<div class="text-slate-700">{{ r.transcript }}</div>{% endif %}
+          {% if r.media == 'audio' %}<audio controls preload="none" class="mt-1 h-8 w-full" src="/dashboard/media/{{ r.id }}"></audio>{% endif %}
+          {% if r.media_purged %}<div class="text-xs text-slate-400 mt-1">Recording deleted (retention policy)</div>{% endif %}
+          {% if r.media == 'image' %}<a href="/dashboard/media/{{ r.id }}" target="_blank" rel="noopener noreferrer" class="text-blue-700 underline">View slip photo</a>{% endif %}
+        </td>
+        <td class="px-2 py-2">{% if r.can_correct %}<a class="text-blue-700 underline" href="/dashboard/correct/{{ r.id }}">Correct</a>{% endif %}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="8" class="px-4 py-6 text-slate-400">No records yet.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>

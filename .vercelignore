@@ -1,0 +1,16 @@
+# Never upload secrets or local data, whatever else is configured.
+.env
+.env.*
+!.env.example
+*.db
+media/
+.venv/
+tests/
+evals/
+samples/
+.git/
+*.pem
+*.key
+*credentials*.json
+*service-account*.json
+*service_account*.json

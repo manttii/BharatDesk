@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BharatDesk sandbox</title>
+<style>
+  :root { --bg:#f6f7f9; --card:#fff; --ink:#1b1f24; --mute:#5b6570; --line:#dde1e6; --accent:#0b6b5c; --warn:#a15c00; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#14181c; --card:#1d2227; --ink:#e8ebee; --mute:#98a2ad; --line:#2d343b; --accent:#3fbfa8; --warn:#e0a040; } }
+  * { box-sizing: border-box; }
+  body { margin:0; font:15px/1.45 system-ui, sans-serif; background:var(--bg); color:var(--ink); }
+  main { max-width:880px; margin:0 auto; padding:16px; }
+  h1 { font-size:20px; margin:4px 0 2px; } .sub { color:var(--mute); margin:0 0 14px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px; margin:12px 0; }
+  .row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+  textarea { width:100%; min-height:64px; padding:8px; border:1px solid var(--line); border-radius:8px; background:var(--bg); color:var(--ink); font:inherit; }
+  button, select { font:inherit; padding:8px 12px; border-radius:8px; border:1px solid var(--line); background:var(--card); color:var(--ink); cursor:pointer; }
+  button.primary { background:var(--accent); color:#fff; border-color:var(--accent); }
+  button:disabled { opacity:.5; cursor:default; }
+  .banner { border-left:4px solid var(--warn); padding:8px 12px; background:var(--card); border-radius:6px; }
+  .reply { border:1px solid var(--line); border-radius:10px; padding:10px; margin:8px 0; white-space:pre-wrap; }
+  .reply .to { font-size:12px; color:var(--mute); text-transform:uppercase; letter-spacing:.04em; }
+  .btns { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+  details { border-top:1px solid var(--line); padding:6px 0; } summary { cursor:pointer; font-weight:600; }
+  pre { margin:6px 0 0; overflow:auto; background:var(--bg); padding:8px; border-radius:6px; font-size:12.5px; }
+  #rec.on { background:#b3261e; color:#fff; border-color:#b3261e; }
+</style>
+</head>
+<body>
+<main>
+  <h1>BharatDesk sandbox</h1>
+  <p class="sub">Runs the real pipeline without Telegram. Demo tenant only; the benchmark here is demo data, not a market rate.</p>
+  <div id="banner" class="banner" hidden></div>
+
+  <div class="card">
+    <div class="row">
+      <label>Speaking as
+        <select id="who"><option value="rep">Rep</option><option value="boss">Boss</option></select>
+      </label>
+      <button id="rec" type="button">● Record voice note</button>
+      <label>or upload audio / a slip photo <input id="file" type="file" accept="audio/*,image/*"></label>
+    </div>
+    <p style="margin:10px 0 6px">or type a note:</p>
+    <textarea id="text" placeholder="Rajendra Jewellers gaya tha, dedh sau gram necklace, paintalis hazaar advance, kal delivery"></textarea>
+    <div class="row" style="margin-top:8px"><button id="send" class="primary" type="button">Send</button><span id="busy" class="sub" hidden>working...</span></div>
+  </div>
+
+  <div class="card"><h2 style="font-size:16px;margin:0 0 6px">Replies</h2><div id="replies"><span class="sub">Nothing yet.</span></div></div>
+  <div class="card"><h2 style="font-size:16px;margin:0 0 6px">Pipeline stages</h2><div id="stages"><span class="sub">Nothing yet.</span></div></div>
+</main>
+<script>
+// Everything from the server (transcripts, names) is untrusted text: only textContent is used.
+const $ = (id) => document.getElementById(id);
+let recorder = null, chunks = [], recorded = null;
+
+fetch('/sandbox/status').then(r => r.json()).then(s => {
+  const missing = [];
+  if (!s.stt) missing.push('speech-to-text (GROQ_API_KEY + WHISPER_MODEL)');
+  if (!s.llm) missing.push('extraction (GEMINI_API_KEY + GEMINI_MODEL)');
+  if (missing.length) { $('banner').hidden = false; $('banner').textContent = 'Not configured: ' + missing.join('; ') + '. Set them in .env and restart. Nothing is simulated.'; }
+});
+
+$('rec').onclick = async () => {
+  if (recorder && recorder.state === 'recording') { recorder.stop(); return; }
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const mime = MediaRecorder.isTypeSupported('audio/webm;codecs=opus') ? 'audio/webm;codecs=opus' : '';
+    recorder = new MediaRecorder(stream, mime ? { mimeType: mime } : undefined);
+    chunks = [];
+    recorder.ondataavailable = e => chunks.push(e.data);
+    recorder.onstop = () => { stream.getTracks().forEach(t => t.stop()); recorded = new Blob(chunks, { type: recorder.mimeType || 'audio/webm' });
+      $('rec').classList.remove('on'); $('rec').textContent = '● Record again (voice note ready)'; };
+    recorder.start(); $('rec').classList.add('on'); $('rec').textContent = '■ Stop recording';
+  } catch (e) { alert('Microphone unavailable: ' + e.message); }
+};
+
+function el(tag, cls, text) { const n = document.createElement(tag); if (cls) n.className = cls; if (text !== undefined) n.textContent = text; return n; }
+
+function render(result) {
+  const replies = $('replies'); replies.replaceChildren();
+  if (!result.replies.length) replies.append(el('span', 'sub', 'No replies.'));
+  for (const r of result.replies) {
+    const box = el('div', 'reply'); box.append(el('div', 'to', 'to ' + r.to), el('div', '', r.text));
+    if (r.buttons.length) { const b = el('div', 'btns');
+      for (const row of r.buttons) for (const btn of row) { const x = el('button', '', btn.text);
+        x.onclick = () => tap(r.to, btn.data); b.append(x); }
+      box.append(b); }
+    replies.append(box);
+  }
+  for (const t of result.toasts) replies.append(el('div', 'sub', 'toast: ' + t));
+  const stages = $('stages'); stages.replaceChildren();
+  if (!result.stages.length) stages.append(el('span', 'sub', 'No stages recorded.'));
+  for (const s of result.stages) { const d = el('details'); d.open = ['transcript','assessment','commit'].includes(s.stage);
+    d.append(el('summary', '', s.stage)); const { stage, ...rest } = s; d.append(el('pre', '', JSON.stringify(rest, null, 2))); stages.append(d); }
+}
+
+async function post(url, init) {
+  $('busy').hidden = false; $('send').disabled = true;
+  try { const r = await fetch(url, init); if (!r.ok) throw new Error(r.status + ' ' + await r.text()); render(await r.json()); }
+  catch (e) { alert(e.message); } finally { $('busy').hidden = true; $('send').disabled = false; }
+}
+function tap(to, data) { post('/sandbox/tap', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ as_user: to === 'boss' ? 'boss' : 'rep', data }) }); }
+
+$('send').onclick = () => {
+  const fd = new FormData(); fd.append('as_user', $('who').value);
+  const f = $('file').files[0];
+  if (f) fd.append('audio', f, f.name); else if (recorded) fd.append('audio', recorded, 'recording.webm'); else fd.append('text', $('text').value);
+  post('/sandbox/run', { method: 'POST', body: fd });
+};
+</script>
+</body>
+</html>

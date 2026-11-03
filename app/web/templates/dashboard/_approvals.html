@@ -1,0 +1,14 @@
+<div class="rounded-lg bg-white p-4 shadow-sm border border-slate-200">
+  <h2 class="font-semibold mb-2">Pending approvals <span class="text-slate-400">({{ approvals|length }})</span></h2>
+  {% if approvals %}
+  <ul class="space-y-2 text-sm">
+    {% for a in approvals %}
+    <li class="rounded border border-amber-200 bg-amber-50 p-2">
+      <div class="font-medium">{{ a.client }} &middot; {{ a.amount }} <span class="text-slate-500">by {{ a.rep }}</span></div>
+      <div class="text-slate-700">{{ a.reason }}</div>
+      <div class="text-xs text-slate-500">expires {{ a.expires }}. Approve or reject in Telegram.</div>
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}<p class="text-sm text-slate-400">Nothing waiting for you.</p>{% endif %}
+</div>

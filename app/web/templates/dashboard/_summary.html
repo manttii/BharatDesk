@@ -1,0 +1,19 @@
+<div class="grid gap-4 sm:grid-cols-3">
+  <div class="rounded-lg bg-white p-4 shadow-sm border border-slate-200">
+    <div class="text-xs uppercase tracking-wide text-slate-500">Visits today</div>
+    <div class="text-3xl font-semibold">{{ visits_today }}</div>
+  </div>
+  <div class="rounded-lg bg-white p-4 shadow-sm border border-slate-200">
+    <div class="text-xs uppercase tracking-wide text-slate-500">Order value today</div>
+    <div class="text-3xl font-semibold">{{ value_today }}</div>
+    {% if value_waiting %}<div class="text-xs text-amber-700">+ {{ value_waiting }} awaiting your approval (not counted)</div>{% endif %}
+  </div>
+  <div class="rounded-lg bg-white p-4 shadow-sm border border-slate-200">
+    <div class="text-xs uppercase tracking-wide text-slate-500">By rep (today)</div>
+    {% if per_rep %}
+    <ul class="mt-1 text-sm">
+      {% for name, n in per_rep %}<li class="flex justify-between"><span>{{ name }}</span><span class="font-medium">{{ n }}</span></li>{% endfor %}
+    </ul>
+    {% else %}<div class="text-sm text-slate-400">No visits yet</div>{% endif %}
+  </div>
+</div>

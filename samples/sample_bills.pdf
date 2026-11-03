@@ -1,0 +1,54 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R 5 0 R 7 0 R] /Count 3 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 9 0 R >> >> >>
+endobj
+4 0 obj
+<< /Length 427 >>
+stream
+BT /F1 12 Tf 16 TL 50 740 Td (TAX INVOICE) Tj T* (Supplier: Gupta Traders) Tj T* (Invoice No: GT-2041) Tj T* (Date: 01/11/2026) Tj T* (Bill to: Sharma General Store) Tj T* () Tj T* (1. Basmati Rice   25 kg   Rs 80.00   Rs 2000.00) Tj T* (2. Sugar   20 kg   Rs 44.00   Rs 880.00) Tj T* (3. Toor Dal   10 kg   Rs 130.00   Rs 1300.00) Tj T* () Tj T* (Subtotal: Rs 4180.00) Tj T* (GST 5%: Rs 209.00) Tj T* (Total: Rs 4389.00) Tj ET
+endstream
+endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 6 0 R /Resources << /Font << /F1 9 0 R >> >> >>
+endobj
+6 0 obj
+<< /Length 299 >>
+stream
+BT /F1 12 Tf 16 TL 50 740 Td (SALES BILL) Tj T* (Sharma General Store) Tj T* (Bill No: S-118) Tj T* (Date: 02/11/2026) Tj T* (Customer: Anil Kirana) Tj T* () Tj T* (1. Basmati Rice   8 kg   Rs 95.00   Rs 760.00) Tj T* (2. Sugar   5 kg   Rs 52.00   Rs 260.00) Tj T* () Tj T* (Total: Rs 1020.00) Tj ET
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 8 0 R /Resources << /Font << /F1 9 0 R >> >> >>
+endobj
+8 0 obj
+<< /Length 304 >>
+stream
+BT /F1 12 Tf 16 TL 50 740 Td (INVOICE) Tj T* (Singh Stationers) Tj T* (Invoice No: ST-77) Tj T* (Date: 03/11/2026) Tj T* (Bill to: Sharma General Store) Tj T* () Tj T* (1. Notebook   12 pcs   Rs 40.00   Rs 480.00) Tj T* (2. Pen box   5 pcs   Rs 90.00   Rs 450.00) Tj T* () Tj T* (Total: Rs 1100.00) Tj ET
+endstream
+endobj
+9 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+xref
+0 10
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000127 00000 n 
+0000000253 00000 n 
+0000000731 00000 n 
+0000000857 00000 n 
+0000001207 00000 n 
+0000001333 00000 n 
+0000001688 00000 n 
+trailer
+<< /Size 10 /Root 1 0 R >>
+startxref
+1758
+%%EOF
